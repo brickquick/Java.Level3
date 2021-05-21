@@ -54,7 +54,22 @@ public class BaseAuthService implements AuthService {
 //        entries.add(new Entry("login3", "pass3", "nick3"));
     }
 
-    private static void showTable() {
+    @Override
+    public void changeNick(String oldNick, String newNick) {
+        try {
+            c.setAutoCommit(false);
+            System.out.println("Opened database adasd123123123444");
+            stmt = c.createStatement();
+            String sql = "UPDATE entries set nick = '" + newNick + "' where nick = '" + oldNick + "' ;";
+            stmt.executeUpdate(sql);
+            c.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void showTable() {
         try {
             c.setAutoCommit(false);
             System.out.println("Opened database successfully123");

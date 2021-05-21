@@ -106,11 +106,12 @@ public class ClientHandler {
             String strFromClient = in.readUTF().trim();
             System.out.println("от " + name + ": " + strFromClient);
             if (strFromClient.startsWith("/")) {
+                String[] tokens = strFromClient.split("\\s");
+
                 if (strFromClient.equals("/end")) {
                     break;
                 }
                 if (strFromClient.startsWith("/w ")) {
-                    String[] tokens = strFromClient.split("\\s");
                     String nick = tokens[1];
                     String msg = strFromClient.substring(4 + nick.length());
                     myServer.sendMsgToClient(this, nick, msg);
@@ -118,9 +119,23 @@ public class ClientHandler {
                 if (strFromClient.equals("/clients")) {
                     myServer.readClientsList(this);
                 }
+                if (strFromClient.startsWith("/newnick ")) {
+                    String oldNick = tokens[1];
+                    String newNick = tokens[2];
+//                    if (oldNick == name) {
+                        myServer.unsubscribe(this);
+                        myServer.getAuthService().changeNick(oldNick, newNick);
+                        name = newNick;
+                        myServer.subscribe(this);
+//                    }
+                }
+                if (strFromClient.equals("/showtable")) {
+                    myServer.getAuthService().showTable();
+                }
                 if (strFromClient.equals("/help")) {
                     sendMsg("Chat помощь:\n/clients - получить список ников подключенных пользователей\n" +
-                            "/w <ник> <сообщение> - послать личное сообщение");
+                            "/w <ник> <сообщение> - послать личное сообщение\n" +
+                            "/newnick <текущий ник> <новый ник> - сменить ник на новый\n");
                 } else {
                     sendMsg("Введите /help, чтобы получить список основных команд.");
                 }
