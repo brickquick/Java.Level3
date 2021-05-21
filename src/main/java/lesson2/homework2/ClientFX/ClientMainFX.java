@@ -1,4 +1,4 @@
-package lesson2.homework2.Client1FX;
+package lesson2.homework2.ClientFX;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -9,7 +9,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
-public class Main extends Application {
+public class ClientMainFX extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{

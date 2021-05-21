@@ -57,8 +57,8 @@ public class ClientHandler {
                 while (socket != null && !socket.isClosed()) {
                     finish = System.currentTimeMillis();
                     try {
-                        if (socket.getSoTimeout() - (finish - start) <= 5000 && socket.getSoTimeout() != 0) {
-                            sendMsg("Server: ВЫ БУДЕТЕ ОТКЛЮЧЕНЫ ЧЕРЕЗ 5 СЕКУНД!!!!!");
+                        if (socket.getSoTimeout() - (finish - start) <= 10000 && socket.getSoTimeout() != 0) {
+                            sendMsg("Server: ЕСЛИ ВЫ НЕ АВТОРИЗУЕТЕСЬ, ТО БУДЕТЕ ОТКЛЮЧЕНЫ ЧЕРЕЗ 10 СЕКУНД!");
                             break;
                         }
                     } catch (SocketException e) {
@@ -117,6 +117,12 @@ public class ClientHandler {
                 }
                 if (strFromClient.equals("/clients")) {
                     myServer.readClientsList(this);
+                }
+                if (strFromClient.equals("/help")) {
+                    sendMsg("Chat помощь:\n/clients - получить список ников подключенных пользователей\n" +
+                            "/w <ник> <сообщение> - послать личное сообщение");
+                } else {
+                    sendMsg("Введите /help, чтобы получить список основных команд.");
                 }
                 continue;
             }

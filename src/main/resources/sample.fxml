@@ -4,11 +4,11 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.control.TextArea?>
 
-<VBox fx:id="mainBox" alignment="center" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lesson2.homework2.Client1FX.Controller">
+<VBox fx:id="mainBox" alignment="center" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lesson2.homework2.ClientFX.Controller">
     <HBox fx:id="topPanel" alignment="CENTER_RIGHT">
-        <TextField fx:id="loginField" HBox.hgrow="ALWAYS" onAction="#focusFieldPass" text="login1"/>
-        <TextField fx:id="passField" HBox.hgrow="ALWAYS" onAction="#openConnectionFromPassField" text="pass1"/>
-        <Button fx:id="auth" HBox.hgrow="ALWAYS" maxWidth="Infinity" maxHeight="Infinity" onAction="#onAuthClick" text="Authentication" />
+        <TextField fx:id="loginField" HBox.hgrow="ALWAYS" onAction="#focusFieldPass" text="login2"/>
+        <TextField fx:id="passField" HBox.hgrow="ALWAYS" onAction="#openConnectionFromPassField" text="pass2"/>
+        <Button fx:id="authBtn" HBox.hgrow="ALWAYS" maxWidth="Infinity" maxHeight="Infinity" onAction="#onAuthClick" text="Authentication" />
     </HBox>
 
     <TextArea fx:id="chatArea" editable="false" VBox.vgrow="ALWAYS" />

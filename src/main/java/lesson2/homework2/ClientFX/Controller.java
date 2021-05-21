@@ -1,4 +1,4 @@
-package lesson2.homework2.Client1FX;
+package lesson2.homework2.ClientFX;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -6,7 +6,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-import javax.swing.*;
 import java.io.*;
 import java.net.Socket;
 import java.net.URL;
@@ -26,7 +25,7 @@ public class Controller implements Initializable {
     @FXML
     public HBox topPanel;
     @FXML
-    private Button auth;
+    private Button authBtn;
     @FXML
     private TextField loginField;
     @FXML
@@ -74,24 +73,11 @@ public class Controller implements Initializable {
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
-
-//                    StringWriter sw = new StringWriter();
-//                    e.printStackTrace(new PrintWriter(sw));
-//                    Alert alert = new Alert(Alert.AlertType.ERROR);
-//                    alert.setHeaderText("Отключение от сервера!");
-//                    alert.getDialogPane().setExpandableContent(new ScrollPane(new TextArea(sw.toString())));
-//                    alert.showAndWait();
-
-                    showAlert(e.toString());
                 } finally {
                     closeConnection();
-
                     System.out.println("Отключение от сервера!");
-
-
-                    showAlert("Отключение от сервера!");
-
                     myNick = "";
+                    chatArea.appendText("Вы были отключены от сервера!" + "\n");
                 }
             });
             t.start();
@@ -99,45 +85,44 @@ public class Controller implements Initializable {
             updateTopPanel();
             System.err.println("Не удалось подключиться к серверу");
             e.printStackTrace();
-
-            showAlert(e.toString());
+            showAlert("Не удалось подключиться к серверу!", e.toString());
         }
     }
 
-    private void showAlert(String str) {
+    private void showAlert(String msg, String err) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setHeaderText("Не удалось подключиться к серверу!");
-        alert.getDialogPane().setExpandableContent(new ScrollPane(new TextArea(str)));
+        alert.setHeaderText(msg);
+        alert.getDialogPane().setExpandableContent(new ScrollPane(new TextArea(err)));
         alert.showAndWait();
     }
 
     public void updateTopPanel() {
         if ((myNick == null || myNick == "") || (socket == null || socket.isClosed())) {
-            auth.setText("Connect to server");
+            authBtn.setText("Connect to server");
             passField.setVisible(false);
             loginField.setVisible(false);
             passField.setMaxWidth(0);
             loginField.setMaxWidth(0);
-            auth.setMinWidth(topPanel.getWidth());
-            auth.setDisable(false);
+            authBtn.setMinWidth(topPanel.getWidth());
+            authBtn.setDisable(false);
         }
         if ((myNick == null || myNick == "") && (socket != null && !socket.isClosed())) {
-            auth.setText("Authentication");
+            authBtn.setText("Authentication");
             passField.setVisible(true);
             loginField.setVisible(true);
             passField.setMaxWidth(Double.MAX_VALUE);
             loginField.setMaxWidth(Double.MAX_VALUE);
-            auth.setMinWidth(0);
-            auth.setDisable(false);
+            authBtn.setMinWidth(0);
+            authBtn.setDisable(false);
         }
         if ((myNick != "" && myNick != null) && (socket != null && !socket.isClosed())) {
-            auth.setText("Online: " + myNick);
+            authBtn.setText("Online: " + myNick);
             passField.setVisible(false);
             loginField.setVisible(false);
             passField.setMaxWidth(0);
             loginField.setMaxWidth(0);
-            auth.setMinWidth(topPanel.getWidth());
-            auth.setDisable(true);
+            authBtn.setMinWidth(topPanel.getWidth());
+            authBtn.setDisable(true);
         }
     }
 
@@ -148,6 +133,7 @@ public class Controller implements Initializable {
             } catch (IOException e) {
                 e.printStackTrace();
                 System.out.println("Ошибка отправки сообщения");
+                showAlert("Ошибка отправки сообщения!", e.toString());
 //                JOptionPane.showMessageDialog(null, "Ошибка отправки сообщения");
             }
             inputTextField.clear();

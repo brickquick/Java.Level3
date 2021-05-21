@@ -1,4 +1,4 @@
-package lesson2.homework2.Client2SWING;
+package lesson2.homework2.ClientSwing;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,7 +11,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
-public class ClientMain extends JFrame {
+public class ClientMainSwing extends JFrame {
     private final String SERVER_ADDR = "localhost";
     private final int SERVER_PORT = 8189;
 
@@ -30,7 +30,7 @@ public class ClientMain extends JFrame {
 
     private String myNick = "";
 
-    public ClientMain() {
+    public ClientMainSwing() {
         openConnection();
         prepareGUI();
     }
@@ -67,6 +67,7 @@ public class ClientMain extends JFrame {
                     closeConnection();
                     JOptionPane.showMessageDialog(null, "Отключение от сервера");
                     myNick = "";
+                    chatArea.append("Вы были отключены от сервера!" + "\n");
                 }
             });
             t.start();
@@ -245,7 +246,7 @@ public class ClientMain extends JFrame {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new ClientMain();
+                new ClientMainSwing();
             }
         });
     }

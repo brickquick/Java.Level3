@@ -3,6 +3,7 @@ package lesson2.homework2.Server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +20,6 @@ public class MyServer {
     public MyServer() {
         try (ServerSocket server = new ServerSocket(PORT)) {
             authService = new BaseAuthService();
-            authService.start();
             clients = new ArrayList<>();
 
             for (int i = 1;; i++){
@@ -29,6 +29,8 @@ public class MyServer {
             }
         } catch (IOException e) {
             System.out.println("Ошибка в работе сервера");
+        } catch (SQLException e) {
+            e.printStackTrace();
         } finally {
             if (authService != null) {
                 authService.stop();
@@ -46,14 +48,6 @@ public class MyServer {
         }
         from.sendMsg("Участника с ником " + nickTo + " нет в чат-комнате");
     }
-
-//    public synchronized void broadcastClientsList() {
-//        StringBuilder sb = new StringBuilder("/clients ");
-//        for (ClientHandler o : clients) {
-//            sb.append(o.getName() + " ");
-//        }
-//        broadcastMsg(sb.toString());
-//    }
 
     public synchronized void readClientsList(ClientHandler from) {
         StringBuilder str = new StringBuilder("/clients ");
