@@ -28,7 +28,7 @@ public class BaseAuthService implements AuthService {
 
     private List<Entry> entries;
 
-    public BaseAuthService() throws SQLException{
+    public BaseAuthService() {
 
         entries = new ArrayList<>();
 
@@ -46,6 +46,32 @@ public class BaseAuthService implements AuthService {
 //        entries.add(new Entry("login1", "pass1", "nick1"));
 //        entries.add(new Entry("login2", "pass2", "nick2"));
 //        entries.add(new Entry("login3", "pass3", "nick3"));
+    }
+
+
+    @Override
+    public void showTable() {
+        try {
+            c.setAutoCommit(false);
+            stmt = c.createStatement();
+            ResultSet rs = stmt.executeQuery( "SELECT * FROM entries;" );
+
+            while ( rs.next() ) {
+                int id = rs.getInt("id");
+                String  login = rs.getString("login");
+                String pass  = rs.getString("pass");
+                String  nick = rs.getString("nick");
+
+                System.out.println( "id = " + id );
+                System.out.println( "login = " + login );
+                System.out.println( "pass = " + pass );
+                System.out.println( "nick = " + nick );
+                System.out.println();
+            }
+            rs.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -84,77 +110,6 @@ public class BaseAuthService implements AuthService {
     }
 
     @Override
-    public void showTable() {
-        try {
-            c.setAutoCommit(false);
-            stmt = c.createStatement();
-            ResultSet rs = stmt.executeQuery( "SELECT * FROM entries;" );
-
-            while ( rs.next() ) {
-                int id = rs.getInt("id");
-                String  login = rs.getString("login");
-                String pass  = rs.getString("pass");
-                String  nick = rs.getString("nick");
-
-                System.out.println( "id = " + id );
-                System.out.println( "login = " + login );
-                System.out.println( "pass = " + pass );
-                System.out.println( "nick = " + nick );
-                System.out.println();
-            }
-            rs.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void createTable() throws SQLException {
-            stmt = c.createStatement();
-            String sql = "CREATE TABLE entries " +
-                    "(id       INT PRIMARY KEY NOT NULL," +
-                    " login    CHAR(50)        NOT NULL, " +
-                    " pass     CHAR(50)        NOT NULL, " +
-                    " nick     CHAR(50)        NOT NULL)";
-            stmt.executeUpdate(sql);
-            System.out.println("Table created successfully");
-    }
-
-    public List<Entry> getAllEntries() {
-        try {
-            ResultSet resultSet = stmt.executeQuery("SELECT login, pass, nick FROM entries");
-            while (resultSet.next()) {
-                entries.add(new Entry(
-                        resultSet.getString("login"),
-                        resultSet.getString("pass"),
-                        resultSet.getString("nick")));
-            }
-            return entries;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return Collections.emptyList();
-        }
-    }
-
-    public void addEntry() {
-        try {
-            c.setAutoCommit(false);
-            stmt = c.createStatement();
-            String sql = "INSERT INTO entries (ID,login,pass,nick) VALUES (1, 'login1', 'pass1', 'nick1');";
-            stmt.executeUpdate(sql);;
-
-            sql = "INSERT INTO entries (ID,login,pass,nick) VALUES (2, 'login2', 'pass2', 'nick2');";
-            stmt.executeUpdate(sql);;
-
-            sql = "INSERT INTO entries (ID,login,pass,nick) VALUES (3, 'login3', 'pass3', 'nick3');";
-            stmt.executeUpdate(sql);
-            c.commit();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    @Override
     public String getNickByLoginPass(String login, String pass) {
         for (Entry o : entries) {
             if (o.login.equals(login) && o.pass.equals(pass)) {
@@ -184,6 +139,52 @@ public class BaseAuthService implements AuthService {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    private List<Entry> getAllEntries() {
+        try {
+            ResultSet resultSet = stmt.executeQuery("SELECT login, pass, nick FROM entries");
+            while (resultSet.next()) {
+                entries.add(new Entry(
+                        resultSet.getString("login"),
+                        resultSet.getString("pass"),
+                        resultSet.getString("nick")));
+            }
+            return entries;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
+
+    private void addEntry() {
+        try {
+            c.setAutoCommit(false);
+            stmt = c.createStatement();
+            String sql = "INSERT INTO entries (ID,login,pass,nick) VALUES (1, 'login1', 'pass1', 'nick1');";
+            stmt.executeUpdate(sql);;
+
+            sql = "INSERT INTO entries (ID,login,pass,nick) VALUES (2, 'login2', 'pass2', 'nick2');";
+            stmt.executeUpdate(sql);;
+
+            sql = "INSERT INTO entries (ID,login,pass,nick) VALUES (3, 'login3', 'pass3', 'nick3');";
+            stmt.executeUpdate(sql);
+            c.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private static void createTable() throws SQLException {
+        stmt = c.createStatement();
+        String sql = "CREATE TABLE entries " +
+                "(id       INT PRIMARY KEY NOT NULL," +
+                " login    CHAR(50)        NOT NULL, " +
+                " pass     CHAR(50)        NOT NULL, " +
+                " nick     CHAR(50)        NOT NULL)";
+        stmt.executeUpdate(sql);
+        System.out.println("Table created successfully");
     }
 
 }
