@@ -81,9 +81,9 @@ public class ClientHandler {
                 } else {
                     nick = myServer.getAuthService().getNickByLoginPass(parts[1], parts[2]);
                     if (nick != null) {
-                        if (!myServer.isNickBusy(nick)) {
+                        if (!myServer.isAccountBusy(nick)) {
                             sendMsg("/authok " + nick);
-                            System.out.print(name );
+                            System.out.print(name);
                             name = nick;
                             myServer.subscribe(this);
                             socket.setSoTimeout(0);
@@ -107,7 +107,6 @@ public class ClientHandler {
             System.out.println("от " + name + ": " + strFromClient);
             if (strFromClient.startsWith("/")) {
                 String[] tokens = strFromClient.split("\\s");
-
                 if (strFromClient.equals("/end")) {
                     break;
                 }
@@ -115,22 +114,36 @@ public class ClientHandler {
                     String nick = tokens[1];
                     String msg = strFromClient.substring(4 + nick.length());
                     myServer.sendMsgToClient(this, nick, msg);
+                    continue;
                 }
                 if (strFromClient.equals("/clients")) {
                     myServer.readClientsList(this);
+                    continue;
                 }
                 if (strFromClient.startsWith("/newnick ")) {
-                    String oldNick = tokens[1];
-                    String newNick = tokens[2];
-//                    if (oldNick == name) {
-                        myServer.unsubscribe(this);
-                        myServer.getAuthService().changeNick(oldNick, newNick);
-                        name = newNick;
-                        myServer.subscribe(this);
-//                    }
+                    if (tokens.length < 3) {
+                        sendMsg("Недостаточно данных для смены ника");
+                    } else {
+                        String oldNick = tokens[1];
+                        String newNick = tokens[2];
+                        if (oldNick.equals(name)) {
+                            if (!myServer.isAccountBusy(newNick) && !myServer.getAuthService().isNickBusy(newNick)) {
+                                myServer.unsubscribe(this);
+                                myServer.getAuthService().changeNick(oldNick, newNick);
+                                name = newNick;
+                                myServer.subscribe(this);
+                                sendMsg("/newnickok " + name);
+                                continue;
+                            } else {
+                                sendMsg("Аккаунт с таким ником уже существует");
+                                continue;
+                            }
+                        }
+                    }
                 }
                 if (strFromClient.equals("/showtable")) {
                     myServer.getAuthService().showTable();
+                    continue;
                 }
                 if (strFromClient.equals("/help")) {
                     sendMsg("Chat помощь:\n/clients - получить список ников подключенных пользователей\n" +

@@ -59,6 +59,11 @@ public class ClientMainSwing extends JFrame {
                             closeConnection();
                             break;
                         }
+                        if (strFromServer.startsWith("/newnickok ")) {
+                            myNick = strFromServer.split("\\s")[1];
+                            updateTopPanel();
+                            continue;
+                        }
                         chatArea.append(strFromServer + "\n");
                     }
                 } catch (IOException e) {
@@ -80,21 +85,22 @@ public class ClientMainSwing extends JFrame {
     }
 
     public void updateTopPanel() {
-        if ((myNick == null || myNick == "") || (socket == null || socket.isClosed())) {
+        if ((myNick == null || myNick.equals("")) || (socket == null || socket.isClosed())) {
             topPanel.add(btnAuth, BorderLayout.EAST);
             btnAuth.setText("Connect to server");
             btnAuth.setEnabled(true);
             topPanel.remove(loginInputField);
             topPanel.remove(passInputField);
         }
-        if ((myNick == null || myNick == "") && (socket != null && !socket.isClosed())) {
+        if ((myNick == null || myNick.equals("")) && (socket != null && !socket.isClosed())) {
             btnAuth.setText("Authentication");
             btnAuth.setEnabled(true);
             topPanel.add(loginInputField);
             topPanel.add(passInputField);
             topPanel.add(btnAuth);
         }
-        if ((myNick != "") && (socket != null && !socket.isClosed())) {
+        assert myNick != null;
+        if ((!myNick.equals("")) && (socket != null && !socket.isClosed())) {
             btnAuth.setEnabled(false);
             topPanel.add(btnAuth, BorderLayout.EAST);
             btnAuth.setText("Online: " + myNick);

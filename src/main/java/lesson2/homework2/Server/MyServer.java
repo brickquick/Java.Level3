@@ -50,14 +50,14 @@ public class MyServer {
     }
 
     public synchronized void readClientsList(ClientHandler from) {
-        StringBuilder str = new StringBuilder("/clients ");
+        StringBuilder str = new StringBuilder("Connected clients:\n");
         for (ClientHandler o : clients) {
             str.append(o.getName()).append(" ");
         }
         from.sendMsg(str.toString());
     }
 
-    public synchronized boolean isNickBusy(String nick) {
+    public synchronized boolean isAccountBusy(String nick) {
         for (ClientHandler o : clients) {
             if (o.getName().equals(nick)) {
                 return true;

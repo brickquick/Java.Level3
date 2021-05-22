@@ -20,19 +20,13 @@ public class BaseAuthService implements AuthService {
         }
     }
 
+    private static final String CON_STR = "jdbc:sqlite:entry.db";
+    private static BaseAuthService instance = null;
+
     private static Connection c;
     private static Statement stmt;
 
-    private static final String CON_STR = "jdbc:sqlite:lol.db";
-    private static BaseAuthService instance = null;
-
     private List<Entry> entries;
-
-//    public static synchronized BaseAuthService getInstance() throws SQLException {
-//        if (instance == null)
-//            instance = new BaseAuthService();
-//        return instance;
-//    }
 
     public BaseAuthService() throws SQLException{
 
@@ -58,22 +52,41 @@ public class BaseAuthService implements AuthService {
     public void changeNick(String oldNick, String newNick) {
         try {
             c.setAutoCommit(false);
-            System.out.println("Opened database adasd123123123444");
             stmt = c.createStatement();
             String sql = "UPDATE entries set nick = '" + newNick + "' where nick = '" + oldNick + "' ;";
             stmt.executeUpdate(sql);
             c.commit();
+
+            entries.removeAll(entries);
+            entries.addAll(getAllEntries());
+
+            System.out.println(oldNick + " na " + newNick);
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     @Override
+    public boolean isNickBusy(String newNick) {
+        try {
+            ResultSet rs = stmt.executeQuery("SELECT * FROM entries;");
+            while (rs.next()) {
+                String nick = rs.getString("nick");
+                if (nick.equals(newNick)) {
+                    return true;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Ошибка связанная с базой данных");
+        }
+        return false;
+    }
+
+    @Override
     public void showTable() {
         try {
             c.setAutoCommit(false);
-            System.out.println("Opened database successfully123");
-
             stmt = c.createStatement();
             ResultSet rs = stmt.executeQuery( "SELECT * FROM entries;" );
 
@@ -93,7 +106,6 @@ public class BaseAuthService implements AuthService {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        System.out.println("Operation done successfully");
     }
 
     private static void createTable() throws SQLException {

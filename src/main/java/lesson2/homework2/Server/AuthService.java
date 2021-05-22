@@ -5,7 +5,8 @@ import java.sql.SQLException;
 public interface AuthService {
     void start() throws ClassNotFoundException, SQLException;
     void changeNick(String oldNick, String newNick);
-    public void showTable();
+    boolean isNickBusy(String newNick);
+    void showTable();
     String getNickByLoginPass(String login, String pass);
     void stop();
 }

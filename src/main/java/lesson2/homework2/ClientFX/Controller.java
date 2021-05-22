@@ -69,6 +69,11 @@ public class Controller implements Initializable {
                             closeConnection();
                             break;
                         }
+                        if (strFromServer.startsWith("/newnickok ")) {
+                            myNick = strFromServer.split("\\s")[1];
+                            updateTopPanel();
+                            continue;
+                        }
                         chatArea.appendText(strFromServer + "\n");
                     }
                 } catch (IOException e) {
@@ -97,7 +102,7 @@ public class Controller implements Initializable {
     }
 
     public void updateTopPanel() {
-        if ((myNick == null || myNick == "") || (socket == null || socket.isClosed())) {
+        if ((myNick == null || myNick.equals("")) || (socket == null || socket.isClosed())) {
             authBtn.setText("Connect to server");
             passField.setVisible(false);
             loginField.setVisible(false);
@@ -106,7 +111,7 @@ public class Controller implements Initializable {
             authBtn.setMinWidth(topPanel.getWidth());
             authBtn.setDisable(false);
         }
-        if ((myNick == null || myNick == "") && (socket != null && !socket.isClosed())) {
+        if ((myNick == null || myNick.equals("")) && (socket != null && !socket.isClosed())) {
             authBtn.setText("Authentication");
             passField.setVisible(true);
             loginField.setVisible(true);
