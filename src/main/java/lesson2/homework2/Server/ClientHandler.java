@@ -133,6 +133,7 @@ public class ClientHandler {
                                 name = newNick;
                                 myServer.subscribe(this);
                                 sendMsg("/newnickok " + name);
+                                myServer.broadcastMsg(oldNick + " сменил ник на " + newNick);
                                 continue;
                             } else {
                                 sendMsg("Аккаунт с таким ником уже существует");
@@ -148,7 +149,7 @@ public class ClientHandler {
                 if (strFromClient.equals("/help")) {
                     sendMsg("Chat помощь:\n/clients - получить список ников подключенных пользователей\n" +
                             "/w <ник> <сообщение> - послать личное сообщение\n" +
-                            "/newnick <текущий ник> <новый ник> - сменить ник на новый\n");
+                            "/newnick <текущий ник> <новый ник> - сменить ник на новый");
                 } else {
                     sendMsg("Введите /help, чтобы получить список основных команд.");
                 }

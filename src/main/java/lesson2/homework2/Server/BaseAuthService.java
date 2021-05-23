@@ -13,34 +13,37 @@ public class BaseAuthService implements AuthService {
         private int id;
 
         public Entry(String login, String pass, String nick) {
-            this.id = id;
             this.login = login;
             this.pass = pass;
             this.nick = nick;
         }
     }
 
-    private static final String CON_STR = "jdbc:sqlite:entry.db";
-    private static BaseAuthService instance = null;
+    private static final String CON_STR = "jdbc:sqlite:src/main/resources/entry.db";
 
     private static Connection c;
     private static Statement stmt;
 
-    private List<Entry> entries;
+    private List<Entry> entries = new ArrayList<>();
 
     public BaseAuthService() {
 
-        entries = new ArrayList<>();
-
         start();
+
         try {
             createTable();
         } catch (SQLException e) {
             System.out.println("Таблица уже существует");
         }
-        addEntry();
-        entries = getAllEntries();
-        System.out.println(entries.size());
+        try {
+            addEntry();
+        } catch (SQLException e) {
+            System.out.println("Таблица уже заполнена");
+        }
+
+
+        entries = new ArrayList<>(getAllEntries());
+
         showTable();
 
 //        entries.add(new Entry("login1", "pass1", "nick1"));
@@ -85,8 +88,6 @@ public class BaseAuthService implements AuthService {
 
             entries.removeAll(entries);
             entries.addAll(getAllEntries());
-
-            System.out.println(oldNick + " na " + newNick);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -157,34 +158,30 @@ public class BaseAuthService implements AuthService {
         }
     }
 
-    private void addEntry() {
-        try {
-            c.setAutoCommit(false);
-            stmt = c.createStatement();
-            String sql = "INSERT INTO entries (ID,login,pass,nick) VALUES (1, 'login1', 'pass1', 'nick1');";
-            stmt.executeUpdate(sql);;
-
-            sql = "INSERT INTO entries (ID,login,pass,nick) VALUES (2, 'login2', 'pass2', 'nick2');";
-            stmt.executeUpdate(sql);;
-
-            sql = "INSERT INTO entries (ID,login,pass,nick) VALUES (3, 'login3', 'pass3', 'nick3');";
-            stmt.executeUpdate(sql);
-            c.commit();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-    }
-
     private static void createTable() throws SQLException {
         stmt = c.createStatement();
         String sql = "CREATE TABLE entries " +
-                "(id       INT PRIMARY KEY NOT NULL," +
+                "(ID       INT PRIMARY KEY NOT NULL," +
                 " login    CHAR(50)        NOT NULL, " +
                 " pass     CHAR(50)        NOT NULL, " +
                 " nick     CHAR(50)        NOT NULL)";
         stmt.executeUpdate(sql);
         System.out.println("Table created successfully");
+    }
+
+    private void addEntry() throws SQLException {
+        c.setAutoCommit(false);
+        stmt = c.createStatement();
+        String sql = "INSERT INTO entries (ID,login,pass,nick) VALUES (1, 'login1', 'pass1', 'nick1');";
+        stmt.executeUpdate(sql);;
+
+        sql = "INSERT INTO entries (ID,login,pass,nick) VALUES (2, 'login2', 'pass2', 'nick2');";
+        stmt.executeUpdate(sql);;
+
+        sql = "INSERT INTO entries (ID,login,pass,nick) VALUES (3, 'login3', 'pass3', 'nick3');";
+        stmt.executeUpdate(sql);
+        c.commit();
+        System.out.println("INSERT INTO entries successfully");
     }
 
 }

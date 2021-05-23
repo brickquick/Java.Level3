@@ -20,6 +20,7 @@ public class MyServer {
     public MyServer() {
         try (ServerSocket server = new ServerSocket(PORT)) {
             authService = new BaseAuthService();
+//            authService.start();
             clients = new ArrayList<>();
 
             for (int i = 1;; i++){
@@ -29,8 +30,6 @@ public class MyServer {
             }
         } catch (IOException e) {
             System.out.println("Ошибка в работе сервера");
-        } catch (SQLException e) {
-            e.printStackTrace();
         } finally {
             if (authService != null) {
                 authService.stop();
