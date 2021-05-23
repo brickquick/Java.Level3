@@ -111,7 +111,7 @@ public class ClientMainSwing extends JFrame {
 
     public void prepareGUI() {
         // Параметры окна////////////////////////////////////////////////////////
-        setBounds(600, 300, 500, 500);
+        setBounds(600, 300, 700, 400);
         setTitle("Client Local Chat");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 

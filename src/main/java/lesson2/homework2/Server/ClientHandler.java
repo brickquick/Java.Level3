@@ -8,11 +8,11 @@ import java.net.SocketException;
 
 public class ClientHandler {
     private MyServer myServer;
-    private Socket socket;
+    private volatile Socket socket;
     private DataInputStream in;
     private DataOutputStream out;
 
-    private static final int SOCKET_TIMEOUT = 120000; //120000
+    private static final int SOCKET_TIMEOUT = 20000; //120000
 
     private String name;
 
@@ -54,16 +54,16 @@ public class ClientHandler {
             public void run() {
                 long start = System.currentTimeMillis();
                 long finish;
-                while (socket != null && !socket.isClosed()) {
-                    finish = System.currentTimeMillis();
-                    try {
+                try {
+                    while (socket.getSoTimeout() != 0) {
+                        finish = System.currentTimeMillis();
                         if (socket.getSoTimeout() - (finish - start) <= 10000 && socket.getSoTimeout() != 0) {
                             sendMsg("Server: ЕСЛИ ВЫ НЕ АВТОРИЗУЕТЕСЬ, ТО БУДЕТЕ ОТКЛЮЧЕНЫ ЧЕРЕЗ 10 СЕКУНД!");
                             break;
                         }
-                    } catch (SocketException e) {
-                        e.printStackTrace();
                     }
+                } catch (SocketException e) {
+                    e.printStackTrace();
                 }
             }
         });
