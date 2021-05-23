@@ -22,8 +22,8 @@ public class Box<T extends Fruit> {
     }
 
 //2. Написать метод, который преобразует массив в ArrayList;
-    private List<T> arrToArrayList(T[] arr) {
-        return Arrays.asList(arr);
+    private ArrayList<T> arrToArrayList(T[] arr) {
+        return new ArrayList<>(Arrays.asList(arr));
     }
 
 //3.d. Сделать метод getWeight() который высчитывает вес коробки, зная количество фруктов и вес одного фрукта

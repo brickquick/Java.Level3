@@ -11,7 +11,9 @@ public class Main {
         System.out.println(box3.getWeight());
         System.out.println(box1.compare(box3));
         System.out.println(box1.compare(box2));
+        System.out.println(box2.getWeight());
         box1.pourOver(box2);
+        System.out.println(box2.getWeight());
         System.out.println(box1.getWeight());
         box1.addFruitInBox(apple1);
         System.out.println(box1.getWeight());
