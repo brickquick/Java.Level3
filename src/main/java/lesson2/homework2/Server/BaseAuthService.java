@@ -23,6 +23,7 @@ public class BaseAuthService implements AuthService {
 
     private static Connection c;
     private static Statement stmt;
+    private static ResultSet resultSet;
 
     private List<Entry> entries = new ArrayList<>();
 
@@ -56,7 +57,6 @@ public class BaseAuthService implements AuthService {
     public void showTable() {
         try {
             c.setAutoCommit(false);
-            stmt = c.createStatement();
             ResultSet rs = stmt.executeQuery( "SELECT * FROM entries;" );
 
             while ( rs.next() ) {
@@ -81,7 +81,6 @@ public class BaseAuthService implements AuthService {
     public void changeNick(String oldNick, String newNick) {
         try {
             c.setAutoCommit(false);
-            stmt = c.createStatement();
             String sql = "UPDATE entries set nick = '" + newNick + "' where nick = '" + oldNick + "' ;";
             stmt.executeUpdate(sql);
             c.commit();
@@ -96,9 +95,9 @@ public class BaseAuthService implements AuthService {
     @Override
     public boolean isNickBusy(String newNick) {
         try {
-            ResultSet rs = stmt.executeQuery("SELECT * FROM entries;");
-            while (rs.next()) {
-                String nick = rs.getString("nick");
+            resultSet = stmt.executeQuery("SELECT * FROM entries;");
+            while (resultSet.next()) {
+                String nick = resultSet.getString("nick");
                 if (nick.equals(newNick)) {
                     return true;
                 }
@@ -125,6 +124,7 @@ public class BaseAuthService implements AuthService {
         try {
             Class.forName("org.sqlite.JDBC");
             c = DriverManager.getConnection(CON_STR);
+            stmt = c.createStatement();
             System.out.println("Opened database successfully");
         } catch (SQLException | ClassNotFoundException e ) {
             e.printStackTrace();
@@ -144,7 +144,7 @@ public class BaseAuthService implements AuthService {
 
     private List<Entry> getAllEntries() {
         try {
-            ResultSet resultSet = stmt.executeQuery("SELECT login, pass, nick FROM entries");
+            resultSet = stmt.executeQuery("SELECT login, pass, nick FROM entries");
             while (resultSet.next()) {
                 entries.add(new Entry(
                         resultSet.getString("login"),
@@ -159,7 +159,6 @@ public class BaseAuthService implements AuthService {
     }
 
     private static void createTable() throws SQLException {
-        stmt = c.createStatement();
         String sql = "CREATE TABLE entries " +
                 "(ID       INT PRIMARY KEY NOT NULL," +
                 " login    CHAR(50)        NOT NULL, " +
@@ -171,7 +170,6 @@ public class BaseAuthService implements AuthService {
 
     private void addEntry() throws SQLException {
         c.setAutoCommit(false);
-        stmt = c.createStatement();
         String sql = "INSERT INTO entries (ID,login,pass,nick) VALUES (1, 'login1', 'pass1', 'nick1');";
         stmt.executeUpdate(sql);;
 
