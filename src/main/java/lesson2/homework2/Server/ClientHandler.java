@@ -67,6 +67,7 @@ public class ClientHandler {
                 }
             }
         });
+        t.setDaemon(true);
         t.start();
     }
 
