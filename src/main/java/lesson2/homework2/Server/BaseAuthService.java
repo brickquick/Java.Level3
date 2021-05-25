@@ -19,7 +19,7 @@ public class BaseAuthService implements AuthService {
         }
     }
 
-    private static final String CON_STR = "jdbc:sqlite:src/main/resources/entry.db";
+    private static final String CON_STR = "jdbc:sqlite:src/main/resources/entries.db";
 
     private static Connection c;
     private static Statement stmt;
