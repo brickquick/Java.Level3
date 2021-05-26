@@ -1,6 +1,7 @@
 package lesson3.homework3.ClientSwing;
 
 import javax.swing.*;
+import javax.swing.text.DefaultCaret;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -115,13 +116,14 @@ public class ClientMainSwing extends JFrame {
         setTitle("Client Local Chat");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-
         // Текстовое поле для вывода сообщений///////////////////////////////////
         chatArea = new JTextArea();
         chatArea.setEditable(false);
         chatArea.setLineWrap(true);
+        // Autoscroll
+        DefaultCaret caret = (DefaultCaret)chatArea.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         add(new JScrollPane(chatArea), BorderLayout.CENTER);
-
 
         // Нижняя панель с полем для ввода сообщений и кнопкой отправки сообщений
         JPanel bottomPanel1 = new JPanel(new BorderLayout());
@@ -143,7 +145,6 @@ public class ClientMainSwing extends JFrame {
                 msgInputField.grabFocus();
             }
         });
-
 
         //Нижняя панель с полями логина и пароля и кнопкой аутентификации////////
         topPanel.setLayout(layout);
@@ -181,7 +182,6 @@ public class ClientMainSwing extends JFrame {
             }
         });
 
-
         // Настраиваем действие на закрытие окна/////////////////////////////////
         addWindowListener(new WindowAdapter() {
             @Override
@@ -194,7 +194,8 @@ public class ClientMainSwing extends JFrame {
             }
         });
 
-        setVisible(true); //visible///////////////////////////////////////////////
+        setVisible(true);
+        //visible///////////////////////////////////////////////
     }
 
     public void onAuthClick() {
