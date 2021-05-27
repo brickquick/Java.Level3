@@ -12,7 +12,7 @@ import javafx.stage.WindowEvent;
 public class ClientMainFX extends Application {
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("/sample.fxml"));
         primaryStage.setTitle("Client Local Chat");
         primaryStage.setScene(new Scene(root, 600, 300));

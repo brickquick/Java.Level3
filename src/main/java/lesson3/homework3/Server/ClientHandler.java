@@ -72,18 +72,20 @@ public class ClientHandler {
     }
 
     private void authentication() throws IOException {
-        while (true){
+        while (true) {
             String str = in.readUTF();
             if (str.startsWith("/auth")) {
                 String[] parts = str.split("\\s");
                 String nick;
+                String login;
                 if (parts.length <= 2) {
                     sendMsg("Server: Недостаточно данных для аутентификации");
                 } else {
                     nick = myServer.getAuthService().getNickByLoginPass(parts[1], parts[2]);
+                    login = parts[1];
                     if (nick != null) {
                         if (!myServer.isAccountBusy(nick)) {
-                            sendMsg("/authok " + nick);
+                            sendMsg("/authok " + nick + " " + login);
                             System.out.print(name);
                             name = nick;
                             myServer.subscribe(this);
@@ -145,6 +147,12 @@ public class ClientHandler {
                 }
                 if (strFromClient.equals("/showtable")) {
                     myServer.getAuthService().showTable();
+                    continue;
+                }
+                if (strFromClient.equals("/spam100")) {
+                    for (int i = 0; i <= 100; i++) {
+                        sendMsg("Server:spam " + i);
+                    }
                     continue;
                 }
                 if (strFromClient.equals("/help")) {

@@ -57,18 +57,18 @@ public class BaseAuthService implements AuthService {
     public void showTable() {
         try {
             c.setAutoCommit(false);
-            ResultSet rs = stmt.executeQuery( "SELECT * FROM entries;" );
+            ResultSet rs = stmt.executeQuery("SELECT * FROM entries;");
 
-            while ( rs.next() ) {
+            while (rs.next()) {
                 int id = rs.getInt("id");
-                String  login = rs.getString("login");
-                String pass  = rs.getString("pass");
-                String  nick = rs.getString("nick");
+                String login = rs.getString("login");
+                String pass = rs.getString("pass");
+                String nick = rs.getString("nick");
 
-                System.out.println( "id = " + id );
-                System.out.println( "login = " + login );
-                System.out.println( "pass = " + pass );
-                System.out.println( "nick = " + nick );
+                System.out.println("id = " + id);
+                System.out.println("login = " + login);
+                System.out.println("pass = " + pass);
+                System.out.println("nick = " + nick);
                 System.out.println();
             }
             rs.close();
@@ -126,7 +126,7 @@ public class BaseAuthService implements AuthService {
             c = DriverManager.getConnection(CON_STR);
             stmt = c.createStatement();
             System.out.println("Opened database successfully");
-        } catch (SQLException | ClassNotFoundException e ) {
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
@@ -171,10 +171,12 @@ public class BaseAuthService implements AuthService {
     private void addEntry() throws SQLException {
         c.setAutoCommit(false);
         String sql = "INSERT INTO entries (ID,login,pass,nick) VALUES (1, 'login1', 'pass1', 'nick1');";
-        stmt.executeUpdate(sql);;
+        stmt.executeUpdate(sql);
+        ;
 
         sql = "INSERT INTO entries (ID,login,pass,nick) VALUES (2, 'login2', 'pass2', 'nick2');";
-        stmt.executeUpdate(sql);;
+        stmt.executeUpdate(sql);
+        ;
 
         sql = "INSERT INTO entries (ID,login,pass,nick) VALUES (3, 'login3', 'pass3', 'nick3');";
         stmt.executeUpdate(sql);
