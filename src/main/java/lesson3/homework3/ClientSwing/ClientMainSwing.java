@@ -54,10 +54,10 @@ public class ClientMainSwing extends JFrame {
                         if (str.startsWith("/authok ")) {
                             myNick = str.split("\\s")[1];
                             myLogin = str.split("\\s")[2];
-                            createLoginFile(myLogin);
+                            initiateLoginFile(myLogin);
                             break;
                         }
-                        writeLoginChatFile(myLogin, str);
+                        writeLoginChatFile(str);
                     }
                     updateTopPanel();
                     while (socket != null && !socket.isClosed()) {
@@ -71,7 +71,7 @@ public class ClientMainSwing extends JFrame {
                             updateTopPanel();
                             continue;
                         }
-                        writeLoginChatFile(myLogin, strFromServer);
+                        writeLoginChatFile(strFromServer);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -79,7 +79,7 @@ public class ClientMainSwing extends JFrame {
                     closeConnection();
                     JOptionPane.showMessageDialog(null, "Отключение от сервера");
                     myNick = "";
-                    writeLoginChatFile(myLogin, "Вы были отключены от сервера!");
+                    writeLoginChatFile("Вы были отключены от сервера!");
                     myLogin = "";
                     try {
                         fos.close();
@@ -119,38 +119,24 @@ public class ClientMainSwing extends JFrame {
         add(bottomPanel1, BorderLayout.SOUTH);
         msgInputField = new JTextField();
         bottomPanel1.add(msgInputField, BorderLayout.CENTER);
-        btnSendMsg.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                sendMessage();
-            }
-        });
-        msgInputField.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                sendMessage();
-                msgInputField.grabFocus();
-            }
+        btnSendMsg.addActionListener(e -> sendMessage());
+        msgInputField.addActionListener(e -> {
+            sendMessage();
+            msgInputField.grabFocus();
         });
 
         // Верхняя панель с полями логина и пароля и кнопкой аутентификации////////
         topPanel.setLayout(layout);
         add(topPanel, BorderLayout.NORTH);
         updateTopPanel();
-        loginInputField.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (!loginInputField.getText().trim().isEmpty()) {
-                    passInputField.grabFocus();
-                }
+        loginInputField.addActionListener(e -> {
+            if (!loginInputField.getText().trim().isEmpty()) {
+                passInputField.grabFocus();
             }
         });
-        passInputField.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (!passInputField.getText().trim().isEmpty() && !loginInputField.getText().trim().isEmpty()) {
-                    btnAuth.doClick();
-                }
+        passInputField.addActionListener(e -> {
+            if (!passInputField.getText().trim().isEmpty() && !loginInputField.getText().trim().isEmpty()) {
+                btnAuth.doClick();
             }
         });
         btnAuth.addActionListener(new ActionListener() {
@@ -254,7 +240,7 @@ public class ClientMainSwing extends JFrame {
         }
     }
 
-    private void createLoginFile(String login) {
+    private void initiateLoginFile(String login) {
         chatArea.setText("");
         try {
             File f = new File("src/main/resources/history_" + login + ".txt");
@@ -285,7 +271,7 @@ public class ClientMainSwing extends JFrame {
         }
     }
 
-    private void writeLoginChatFile(String login, String text) {
+    private void writeLoginChatFile(String text) {
         text += "\n";
         chatArea.append(text);
         try {

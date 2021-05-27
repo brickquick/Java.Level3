@@ -11,7 +11,7 @@
         <Button fx:id="authBtn" HBox.hgrow="ALWAYS" maxWidth="Infinity" maxHeight="Infinity" onAction="#onAuthClick" text="Authentication" />
     </HBox>
 
-    <TextArea fx:id="chatArea" editable="false" VBox.vgrow="ALWAYS" />
+    <TextArea fx:id="chatArea" editable="false" VBox.vgrow="ALWAYS"/>
 
     <HBox alignment="CENTER_RIGHT">
         <TextField fx:id="inputTextField" HBox.hgrow="ALWAYS" onAction="#sendMessage"/>

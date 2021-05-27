@@ -6,11 +6,11 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.net.URL;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
@@ -33,7 +33,11 @@ public class Controller implements Initializable {
     @FXML
     private TextField passField;
 
-    private String myNick;
+    private volatile FileOutputStream fos;
+    private volatile FileInputStream fis;
+
+    private volatile String myNick = "";
+    private volatile String myLogin = "";
 
     private final String SERVER_ADDR = "localhost";
     private final int SERVER_PORT = 8189;
@@ -60,9 +64,11 @@ public class Controller implements Initializable {
                         String str = in.readUTF();
                         if (str.startsWith("/authok ")) {
                             myNick = str.split("\\s")[1];
+                            myLogin = str.split("\\s")[2];
+                            initiateLoginFile(myLogin);
                             break;
                         }
-                        chatArea.appendText(str + "\n");
+                        writeLoginChatFile(str);
                     }
                     updateTopPanel();
                     while (socket != null && !socket.isClosed()) {
@@ -76,7 +82,7 @@ public class Controller implements Initializable {
                             updateTopPanel();
                             continue;
                         }
-                        chatArea.appendText(strFromServer + "\n");
+                        writeLoginChatFile(strFromServer);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -84,7 +90,13 @@ public class Controller implements Initializable {
                     closeConnection();
                     System.out.println("Отключение от сервера!");
                     myNick = "";
-                    chatArea.appendText("Вы были отключены от сервера!" + "\n");
+                    writeLoginChatFile("Вы были отключены от сервера!");
+                    myLogin = "";
+                    try {
+                        fos.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             });
             t.start();
@@ -96,6 +108,69 @@ public class Controller implements Initializable {
         }
     }
 
+    public void closeConnection() {
+        if (socket != null && !socket.isClosed()) {
+            try {
+                in.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        updateTopPanel();
+    }
+
+    public void sendMessage() {
+        if (!inputTextField.getText().trim().isEmpty()) {
+            try {
+                out.writeUTF(inputTextField.getText().trim());
+                inputTextField.clear();
+                inputTextField.requestFocus();
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("Ошибка отправки сообщения");
+                showAlert("Ошибка отправки сообщения!", e.toString());
+            }
+        }
+    }
+
+    public void focusFieldPass() {
+        if (!loginField.getText().trim().isEmpty()) {
+            passField.requestFocus();
+        }
+    }
+
+    public void openConnectionFromPassField() {
+        if (!passField.getText().trim().isEmpty() && !loginField.getText().trim().isEmpty()) {
+            onAuthClick();
+        }
+    }
+
+    public void onAuthClick() {
+        if (socket == null || socket.isClosed()) {
+            openConnection();
+        } else {
+            if (socket != null && !socket.isClosed()) {
+                try {
+                    out.writeUTF("/auth " + loginField.getText() + " " + passField.getText());
+                    loginField.setText("");
+                    passField.setText("");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
     private void showAlert(String msg, String err) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setHeaderText(msg);
@@ -103,7 +178,7 @@ public class Controller implements Initializable {
         alert.showAndWait();
     }
 
-    public void updateTopPanel() {
+    private void updateTopPanel() {
         if ((myNick == null || myNick.equals("")) || (socket == null || socket.isClosed())) {
             authBtn.setText("Connect to server");
             passField.setVisible(false);
@@ -133,70 +208,47 @@ public class Controller implements Initializable {
         }
     }
 
-    public void sendMessage() {
-        if (!inputTextField.getText().trim().isEmpty()) {
-            try {
-                out.writeUTF(inputTextField.getText().trim());
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.out.println("Ошибка отправки сообщения");
-                showAlert("Ошибка отправки сообщения!", e.toString());
-//                JOptionPane.showMessageDialog(null, "Ошибка отправки сообщения");
-            }
-            inputTextField.clear();
-            inputTextField.requestFocus();
-        } else {
-            inputTextField.clear();
-            inputTextField.requestFocus();
-        }
-    }
-
-    private void closeConnection() {
-        if (socket != null && !socket.isClosed()) {
-            try {
-                in.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                out.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                socket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        updateTopPanel();
-    }
-
-    public void onAuthClick() {
-        if (socket == null || socket.isClosed()) {
-            openConnection();
-        } else {
-            if (socket != null && !socket.isClosed()) {
-                try {
-                    out.writeUTF("/auth " + loginField.getText() + " " + passField.getText());
-                    loginField.setText("");
-                    passField.setText("");
-                } catch (Exception e) {
-                    e.printStackTrace();
+    private void initiateLoginFile(String login) {
+//        chatArea.clear();
+        chatArea.setText("");
+        chatArea.appendText("");
+        try {
+            File f = new File("src/main/resources/history_" + login + ".txt");
+            fos = new FileOutputStream("src/main/resources/history_" + login + ".txt", true);
+            if (f.createNewFile()) {
+                System.out.println("File created");
+            } else {
+                System.out.println("File already exists");
+                try (BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/history_" + login + ".txt"))) {
+                    List<String> lines = new LinkedList<>();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        lines.add(line);
+                    }
+                    if (lines.size() > 100) {
+                        for (int i = 100; i > 0; i--) {
+                            chatArea.appendText(lines.get(lines.size() - i) + "\n");
+                        }
+                    } else {
+                        for (String ln : lines) {
+                            chatArea.appendText(ln + "\n");
+                        }
+                    }
                 }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
-    public void focusFieldPass() {
-        if (!loginField.getText().trim().isEmpty()) {
-            passField.requestFocus();
-        }
-    }
-
-    public void openConnectionFromPassField() {
-        if (!passField.getText().trim().isEmpty() && !loginField.getText().trim().isEmpty()) {
-            onAuthClick();
+    private void writeLoginChatFile(String text) {
+        text += "\n";
+        chatArea.appendText(text);
+        try {
+            fos.write(text.getBytes());
+            fos.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
