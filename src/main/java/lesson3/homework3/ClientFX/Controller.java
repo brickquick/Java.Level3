@@ -197,8 +197,8 @@ public class Controller implements Initializable {
             authBtn.setMinWidth(0);
             authBtn.setDisable(false);
         }
-        if ((myNick != "" && myNick != null) && (socket != null && !socket.isClosed())) {
-            authBtn.setText("Online: " + myNick);
+        if ((!myNick.equals("") && myNick != null) && (socket != null && !socket.isClosed())) {
+//            authBtn.setText("Online: " + myNick);
             passField.setVisible(false);
             loginField.setVisible(false);
             passField.setMaxWidth(0);
@@ -220,19 +220,33 @@ public class Controller implements Initializable {
             } else {
                 System.out.println("File already exists");
                 try (BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/history_" + login + ".txt"))) {
-                    List<String> lines = new LinkedList<>();
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        lines.add(line);
+//                    List<String> lines = new LinkedList<>();
+//                    String line;
+//                    while ((line = reader.readLine()) != null) {
+//                        lines.add(line);
+//                    }
+//                    if (lines.size() > 100) {
+//                        for (int i = 100; i > 0; i--) {
+//                            chatArea.appendText(lines.get(lines.size() - i) + "\n");
+//                        }
+//                    } else {
+//                        for (String ln : lines) {
+//                            chatArea.appendText(ln + "\n");
+//                        }
+//                    }
+                    String[] lines = new String[100];
+                    int lastNdx = 0;
+                    for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+                        if (lastNdx == lines.length) {
+                            lastNdx = 0;
+                        }
+                        lines[lastNdx++] = line;
                     }
-                    if (lines.size() > 100) {
-                        for (int i = 100; i > 0; i--) {
-                            chatArea.appendText(lines.get(lines.size() - i) + "\n");
-                        }
-                    } else {
-                        for (String ln : lines) {
-                            chatArea.appendText(ln + "\n");
-                        }
+                    for (int ndx = lastNdx; ndx < lines.length && lines[ndx] != null; ndx++) {
+                        chatArea.appendText(lines[ndx] + "\n");
+                    }
+                    for (int ndx = 0; ndx < lastNdx && lines[ndx] != null; ndx++) {
+                        chatArea.appendText(lines[ndx] + "\n");
                     }
                 }
             }

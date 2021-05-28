@@ -79,6 +79,7 @@ public class ClientMainSwing extends JFrame {
                     closeConnection();
                     JOptionPane.showMessageDialog(null, "Отключение от сервера");
                     myNick = "";
+                    chatArea.setText("");
                     writeLoginChatFile("Вы были отключены от сервера!");
                     myLogin = "";
                     try {
