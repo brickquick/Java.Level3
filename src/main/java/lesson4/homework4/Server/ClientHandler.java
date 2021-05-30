@@ -5,6 +5,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ClientHandler {
     private MyServer myServer;
@@ -28,12 +30,18 @@ public class ClientHandler {
             this.out = new DataOutputStream(socket.getOutputStream());
             this.name = "UNKNOWN-" + order;
             System.out.println("Подключился " + name);
-            new Thread(new Runnable() {
+            socket.setSoTimeout(SOCKET_TIMEOUT);
+            ExecutorService service = Executors.newFixedThreadPool(2);
+            service.execute(new Runnable() {
+                @Override
+                public void run() {
+                    sendTimeout();
+                }
+            });
+            service.execute(new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        socket.setSoTimeout(SOCKET_TIMEOUT);
-                        sendTimeout();
                         authentication();
                         readMessages();
                     } catch (IOException e) {
@@ -42,33 +50,27 @@ public class ClientHandler {
                         closeConnection();
                     }
                 }
-            }).start();
+            });
+            service.shutdown();
         } catch (IOException e) {
             throw new RuntimeException("Проблемы при создании обработчика клиента");
         }
     }
 
     private void sendTimeout() {
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                long start = System.currentTimeMillis();
-                long finish;
-                try {
-                    while (socket.getSoTimeout() != 0) {
-                        finish = System.currentTimeMillis();
-                        if (socket.getSoTimeout() - (finish - start) <= 10000 && socket.getSoTimeout() != 0) {
-                            sendMsg("Server: ЕСЛИ ВЫ НЕ АВТОРИЗУЕТЕСЬ, ТО БУДЕТЕ ОТКЛЮЧЕНЫ ЧЕРЕЗ 10 СЕКУНД!");
-                            break;
-                        }
-                    }
-                } catch (SocketException e) {
-                    e.printStackTrace();
+        long start = System.currentTimeMillis();
+        long finish;
+        try {
+            while (socket.getSoTimeout() != 0) {
+                finish = System.currentTimeMillis();
+                if (socket.getSoTimeout() - (finish - start) <= 10000 && socket.getSoTimeout() != 0) {
+                    sendMsg("Server: ЕСЛИ ВЫ НЕ АВТОРИЗУЕТЕСЬ, ТО БУДЕТЕ ОТКЛЮЧЕНЫ ЧЕРЕЗ 10 СЕКУНД!");
+                    break;
                 }
             }
-        });
-        t.setDaemon(true);
-        t.start();
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
     }
 
     private void authentication() throws IOException {
