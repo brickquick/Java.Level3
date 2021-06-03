@@ -21,7 +21,7 @@ public class BaseAuthService implements AuthService {
 
     private static final String CON_STR = "jdbc:sqlite:src/main/resources/entries.db";
 
-    private static Connection c;
+    private static Connection connection;
     private static Statement stmt;
     private static ResultSet resultSet;
 
@@ -56,7 +56,7 @@ public class BaseAuthService implements AuthService {
     @Override
     public void showTable() {
         try {
-            c.setAutoCommit(false);
+            connection.setAutoCommit(false);
             ResultSet rs = stmt.executeQuery( "SELECT * FROM entries;" );
 
             while ( rs.next() ) {
@@ -79,11 +79,11 @@ public class BaseAuthService implements AuthService {
 
     @Override
     public void changeNick(String oldNick, String newNick) {
-        try {
-            c.setAutoCommit(false);
-            String sql = "UPDATE entries set nick = '" + newNick + "' where nick = '" + oldNick + "' ;";
-            stmt.executeUpdate(sql);
-            c.commit();
+        try(PreparedStatement preparedStatement = connection.prepareStatement(
+                "UPDATE entries set nick = '" + newNick + "' where nick = '" + oldNick + "' ;")) {
+            connection.setAutoCommit(false);
+            preparedStatement.execute();
+            connection.commit();
 
             entries.removeAll(entries);
             entries.addAll(getAllEntries());
@@ -123,8 +123,8 @@ public class BaseAuthService implements AuthService {
     public void start() {
         try {
             Class.forName("org.sqlite.JDBC");
-            c = DriverManager.getConnection(CON_STR);
-            stmt = c.createStatement();
+            connection = DriverManager.getConnection(CON_STR);
+            stmt = connection.createStatement();
             System.out.println("Opened database successfully");
         } catch (SQLException | ClassNotFoundException e ) {
             e.printStackTrace();
@@ -135,7 +135,8 @@ public class BaseAuthService implements AuthService {
     public void stop() {
         try {
             stmt.close();
-            c.close();
+            connection.close();
+            resultSet.close();
             System.out.println("Сервис аутентификации остановлен");
         } catch (SQLException e) {
             e.printStackTrace();
@@ -169,7 +170,7 @@ public class BaseAuthService implements AuthService {
     }
 
     private void addEntry() throws SQLException {
-        c.setAutoCommit(false);
+        connection.setAutoCommit(false);
         String sql = "INSERT INTO entries (ID,login,pass,nick) VALUES (1, 'login1', 'pass1', 'nick1');";
         stmt.executeUpdate(sql);;
 
@@ -178,7 +179,7 @@ public class BaseAuthService implements AuthService {
 
         sql = "INSERT INTO entries (ID,login,pass,nick) VALUES (3, 'login3', 'pass3', 'nick3');";
         stmt.executeUpdate(sql);
-        c.commit();
+        connection.commit();
         System.out.println("INSERT INTO entries successfully");
     }
 
