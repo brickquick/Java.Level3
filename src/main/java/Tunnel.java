@@ -6,19 +6,19 @@ public class Tunnel extends Stage {
     }
 
     @Override
-    public void go(Car c) {
+    public void go(Car car) {
         try {
-            try {
-                System.out.println(c.getName() + " готовится к этапу(ждет): " + description);
-                System.out.println(c.getName() + " начал этап: " + description);
-                Thread.sleep(length / c.getSpeed() * 1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } finally {
-                System.out.println(c.getName() + " закончил этап: " + description);
+            if (Main.smp.hasQueuedThreads()) {
+                System.out.println(car.getName() + " готовится к этапу(ждет): " + description);
             }
-        } catch (Exception e) {
+            Main.smp.acquire();
+            System.out.println(car.getName() + " начал этап: " + description);
+            Thread.sleep(length / car.getSpeed() * 1000);
+        } catch (InterruptedException e) {
             e.printStackTrace();
+        } finally {
+            System.out.println(car.getName() + " закончил этап: " + description);
+            Main.smp.release();
         }
     }
 
