@@ -27,8 +27,7 @@ public class ClientMainSwing extends JFrame {
     private DataInputStream in;
     private DataOutputStream out;
 
-    private volatile FileOutputStream fos;
-    private volatile FileInputStream fis;
+    private FileOutputStream fos;
 
     private volatile String myNick = "";
     private volatile String myLogin = "";
@@ -249,20 +248,6 @@ public class ClientMainSwing extends JFrame {
             } else {
                 System.out.println("File already exists");
                 try (BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/history_" + login + ".txt"))) {
-//                    List<String> lines = new LinkedList<>();
-//                    String line;
-//                    while ((line = reader.readLine()) != null) {
-//                        lines.add(line);
-//                    }
-//                    if (lines.size() > 100) {
-//                        for (int i = 100; i > 0; i--) {
-//                            chatArea.append(lines.get(lines.size() - i) + "\n");
-//                        }
-//                    } else {
-//                        for (String ln : lines) {
-//                            chatArea.append(ln + "\n");
-//                        }
-//                    }
                     String[] lines = new String[100];
                     int lastNdx = 0;
                     for (String line = reader.readLine(); line != null; line = reader.readLine()) {

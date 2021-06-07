@@ -828,3 +828,4 @@ Server:spam 98
 Server:spam 99
 Server:spam 100
 nick1 зашел в чат
+nick1 зашел в чат
