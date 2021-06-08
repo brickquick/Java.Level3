@@ -1,5 +1,8 @@
 package lesson6.homework6.Server;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -8,6 +11,8 @@ import java.util.List;
 
 public class MyServer {
     private final int PORT = 8189;
+
+    private static final Logger LOGGER = LogManager.getLogger(MyServer.class);
 
     private List<ClientHandler> clients;
     private AuthService authService;
@@ -21,14 +26,17 @@ public class MyServer {
             authService = new BaseAuthService();
 //            authService.start();
             clients = new ArrayList<>();
+            LOGGER.info("Сервер успешно запущен");
 
             for (int i = 1;; i++){
-                System.out.println("Сервер ожидает подключения");
+//                System.out.println("Сервер ожидает подключения");
+                LOGGER.info("Сервер ожидает подключения");
                 Socket socket = server.accept();
                 new ClientHandler(this, socket, i);
             }
         } catch (IOException e) {
-            System.out.println("Ошибка в работе сервера");
+//            System.out.println("Ошибка в работе сервера");
+            LOGGER.error("Ошибка в работе сервера");
         } finally {
             if (authService != null) {
                 authService.stop();

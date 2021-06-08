@@ -1,10 +1,11 @@
-public class Homework1_2 {
+package lesson6.homework6;
 
+public class Homework1_2 {
     public static void main(String[] args) {
-        System.out.println(second4(new int[]{1, 1, 1, 4, 4, 1, 4, 4}));
-        System.out.println(second4(new int[]{1, 1, 1, 1, 1, 1}));
-        System.out.println(second4(new int[]{4, 4, 4, 4}));
-        System.out.println(second4(new int[]{1, 4, 4, 1, 1, 4, 3}));
+////        System.out.println(second4(new int[]{1, 1, 1, 4, 4, 1, 4, 4}));
+////        System.out.println(second4(new int[]{1, 1, 1, 1, 1, 1}));
+////        System.out.println(second4(new int[]{4, 4, 4, 4}));
+////        System.out.println(second4(new int[]{1, 4, 4, 1, 1, 4, 3}));
     }
 
     //Написать метод, которому в качестве аргумента передается не пустой одномерный целочисленный массив.
@@ -13,7 +14,7 @@ public class Homework1_2 {
     //необходимо выбросить RuntimeException.
     //Написать набор тестов для этого метода (по 3-4 варианта входных данных).
     //Вх: [ 1 2 4 4 2 3 4 1 7 ] -> вых: [ 1 7 ].
-    public static int[] first4(int[] arr) {
+    public int[] first4(int[] arr) {
         for (int i = arr.length, j = 0; i > 0; i--, j++) {
             if (arr[i - 1] == 4) {
                 int[] arrEnd = new int[j];
@@ -32,7 +33,7 @@ public class Homework1_2 {
     //[ 1 1 1 1 1 1 ] -> false
     //[ 4 4 4 4 ] -> false
     //[ 1 4 4 1 1 4 3 ] -> false
-    public static boolean second4(int[] arr) {
+    public boolean second4(int[] arr) {
         int one = 0, four = 0;
         for (int j : arr) {
             if (j == 1) {
@@ -44,4 +45,5 @@ public class Homework1_2 {
         }
         return four + one >= arr.length && one != 0 && four != 0;
     }
+
 }

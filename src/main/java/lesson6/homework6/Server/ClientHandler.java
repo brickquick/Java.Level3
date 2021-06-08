@@ -1,5 +1,8 @@
 package lesson6.homework6.Server;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -16,6 +19,8 @@ public class ClientHandler {
 
     private static final int SOCKET_TIMEOUT = 20000; //120000
 
+    private static final Logger LOGGER = LogManager.getLogger(ClientHandler.class);
+
     private String name;
 
     public String getName() {
@@ -29,7 +34,8 @@ public class ClientHandler {
             this.in = new DataInputStream(socket.getInputStream());
             this.out = new DataOutputStream(socket.getOutputStream());
             this.name = "UNKNOWN-" + order;
-            System.out.println("Подключился " + name);
+//            System.out.println("Подключился " + name);
+            LOGGER.info("Подключился " + name);
             socket.setSoTimeout(SOCKET_TIMEOUT);
             ExecutorService service = Executors.newFixedThreadPool(2);
             service.execute(new Runnable() {
@@ -53,6 +59,7 @@ public class ClientHandler {
             });
             service.shutdown();
         } catch (IOException e) {
+            LOGGER.error("Проблемы при создании обработчика клиента");
             throw new RuntimeException("Проблемы при создании обработчика клиента");
         }
     }
@@ -88,12 +95,16 @@ public class ClientHandler {
                     if (nick != null) {
                         if (!myServer.isAccountBusy(nick)) {
                             sendMsg("/authok " + nick + " " + login);
-                            System.out.print(name);
+                            String log = name;
+//                            System.out.print(name);
                             name = nick;
                             myServer.subscribe(this);
                             socket.setSoTimeout(0);
-                            System.out.println(" аутентифицирован под ником: " + name);
+//                            System.out.println(" аутентифицирован под ником: " + name);
+                            log += " аутентифицирован под ником: " + name;
+                            LOGGER.info(log);
                             myServer.broadcastMsg(name + " зашел в чат");
+                            LOGGER.info(name + " зашел в чат");
                             return;
                         } else {
                             sendMsg("Учетная запись уже используется");
@@ -109,7 +120,8 @@ public class ClientHandler {
     private void readMessages() throws IOException {
         while (true) {
             String strFromClient = in.readUTF().trim();
-            System.out.println("от " + name + ": " + strFromClient);
+//            System.out.println("от " + name + ": " + strFromClient);
+            LOGGER.info("от " + name + ": " + strFromClient);
             if (strFromClient.startsWith("/")) {
                 String[] tokens = strFromClient.split("\\s");
                 if (strFromClient.equals("/end")) {
@@ -139,11 +151,11 @@ public class ClientHandler {
                                 myServer.subscribe(this);
                                 sendMsg("/newnickok " + name);
                                 myServer.broadcastMsg(oldNick + " сменил ник на " + newNick);
-                                continue;
+                                LOGGER.info(oldNick + " сменил ник на " + newNick);
                             } else {
                                 sendMsg("Аккаунт с таким ником уже существует");
-                                continue;
                             }
+                            continue;
                         }
                     }
                 }
@@ -179,8 +191,11 @@ public class ClientHandler {
     }
 
     private void closeConnection() {
-        myServer.unsubscribe(this);
-        myServer.broadcastMsg(name + " вышел из чата");
+        if (myServer.isAccountBusy(name)) {
+            myServer.unsubscribe(this);
+            myServer.broadcastMsg(name + " вышел из чата");
+        }
+        LOGGER.info(name + " вышел из чата");
         try {
             in.close();
         } catch (IOException e) {

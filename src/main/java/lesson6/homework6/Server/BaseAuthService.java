@@ -1,5 +1,8 @@
 package lesson6.homework6.Server;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,6 +24,8 @@ public class BaseAuthService implements AuthService {
 
     private static final String CON_STR = "jdbc:sqlite:src/main/resources/entry.db";
 
+    private static final Logger LOGGER = LogManager.getLogger(BaseAuthService.class);
+
     private static Connection connection;
     private static Statement stmt;
     private static ResultSet resultSet;
@@ -34,12 +39,14 @@ public class BaseAuthService implements AuthService {
         try {
             createTable();
         } catch (SQLException e) {
-            System.out.println("Таблица уже существует");
+//            System.out.println("Таблица уже существует");
+            LOGGER.info("Таблица уже существует");
         }
         try {
             addEntry();
         } catch (SQLException e) {
-            System.out.println("Таблица уже заполнена");
+//            System.out.println("Таблица уже заполнена");
+            LOGGER.info("Таблица уже заполнена");
         }
 
 
@@ -74,6 +81,7 @@ public class BaseAuthService implements AuthService {
             rs.close();
         } catch (SQLException e) {
             e.printStackTrace();
+            LOGGER.error("Ошибка с базой данных");
         }
     }
 
@@ -87,8 +95,11 @@ public class BaseAuthService implements AuthService {
 
             entries.removeAll(entries);
             entries.addAll(getAllEntries());
+//            System.out.println("Изменения в БД произведены успешно");
+            LOGGER.info("Изменения в БД произведены успешно");
         } catch (SQLException e) {
             e.printStackTrace();
+            LOGGER.error("Ошибка с базой данных");
         }
     }
 
@@ -104,7 +115,8 @@ public class BaseAuthService implements AuthService {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            System.out.println("Ошибка связанная с базой данных");
+//            System.out.println("Ошибка связанная с базой данных");
+            LOGGER.error("Ошибка связанная с базой данных");
         }
         return false;
     }
@@ -125,9 +137,11 @@ public class BaseAuthService implements AuthService {
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection(CON_STR);
             stmt = connection.createStatement();
-            System.out.println("Opened database successfully");
+//            System.out.println("Opened database successfully");
+            LOGGER.info("Успешное подключение к базе данных");
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
+            LOGGER.error("Ошибка подключения к базе дынных");
         }
     }
 
@@ -136,9 +150,11 @@ public class BaseAuthService implements AuthService {
         try {
             stmt.close();
             connection.close();
-            System.out.println("Сервис аутентификации остановлен");
+//            System.out.println("Сервис аутентификации остановлен");
+            LOGGER.info("Сервис аутентификации остановлен");
         } catch (SQLException e) {
             e.printStackTrace();
+            LOGGER.error("Ошибка с БД");
         }
     }
 
@@ -165,23 +181,23 @@ public class BaseAuthService implements AuthService {
                 " pass     CHAR(50)        NOT NULL, " +
                 " nick     CHAR(50)        NOT NULL)";
         stmt.executeUpdate(sql);
-        System.out.println("Table created successfully");
+//        System.out.println("Table created successfully");
+        LOGGER.info("Таблица создана успешно");
     }
 
     private void addEntry() throws SQLException {
         connection.setAutoCommit(false);
         String sql = "INSERT INTO entries (ID,login,pass,nick) VALUES (1, 'login1', 'pass1', 'nick1');";
         stmt.executeUpdate(sql);
-        ;
 
         sql = "INSERT INTO entries (ID,login,pass,nick) VALUES (2, 'login2', 'pass2', 'nick2');";
         stmt.executeUpdate(sql);
-        ;
 
         sql = "INSERT INTO entries (ID,login,pass,nick) VALUES (3, 'login3', 'pass3', 'nick3');";
         stmt.executeUpdate(sql);
         connection.commit();
-        System.out.println("INSERT INTO entries successfully");
+//        System.out.println("INSERT INTO entries successfully");
+        LOGGER.info("INSERT INTO entries successfully");
     }
 
 }
