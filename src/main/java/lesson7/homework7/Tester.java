@@ -20,18 +20,18 @@ public class Tester {
         int t = 0;
         for (Method o : methods) {
             try {
-                if(o.getAnnotation(BeforeSuite.class) != null) {
+                if (o.getAnnotation(BeforeSuite.class) != null) {
                     before[b] = o;
                     b++;
                 }
-                if(o.getAnnotation(AfterSuite.class) != null) {
+                if (o.getAnnotation(AfterSuite.class) != null) {
                     after[a] = o;
                     a++;
                 }
             } catch (ArrayIndexOutOfBoundsException e) {
                 throw new RuntimeException("Методы с аннотациями @BeforeSuite и @AfterSuite должны присутствовать в единственном экземпляре");
             }
-            if(o.getAnnotation(Test.class) != null) {
+            if (o.getAnnotation(Test.class) != null) {
                 if (o.getAnnotation(Test.class).priority() < 0 || o.getAnnotation(Test.class).priority() > 10) {
                     throw new RuntimeException("Приоритет должен быть от 0 до 10");
                 }
