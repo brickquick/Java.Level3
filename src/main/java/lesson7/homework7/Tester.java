@@ -7,11 +7,11 @@ import java.util.Comparator;
 
 public class Tester {
 
-    public static void main(String[] args) {
-        start(ClassTest.class);
-    }
+//    public static void main(String[] args) {
+//        start(ClassTest.class);
+//    }
 
-    public static void start(Class test) {
+    public static void start(Class<?> test) {
         Method[] methods = test.getDeclaredMethods();
         Method[] before = new Method[1];
         int b = 0;
@@ -41,7 +41,7 @@ public class Tester {
 
         try {
             if (before[0] != null) {
-                before[0].invoke(test.newInstance());
+                before[0].invoke(test.getDeclaredConstructor().newInstance());
             }
 
             Method[] tests = new Method[t];
@@ -58,13 +58,13 @@ public class Tester {
                 }
             });
             for (Method m : tests) {
-                m.invoke(test.newInstance());
+                m.invoke(test.getDeclaredConstructor().newInstance());
             }
 
             if (after[0] != null) {
-                after[0].invoke(test.newInstance());
+                after[0].invoke(test.getDeclaredConstructor().newInstance());
             }
-        } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
+        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
             e.printStackTrace();
         }
     }
