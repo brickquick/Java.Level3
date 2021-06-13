@@ -276,6 +276,7 @@ public class ClientMainSwing extends JFrame {
             fos.write(text.getBytes());
             fos.flush();
 //            fos.close();
+        } catch (NullPointerException ignored) {
         } catch (Exception e) {
             e.printStackTrace();
         }

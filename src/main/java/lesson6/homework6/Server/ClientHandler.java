@@ -8,6 +8,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -37,13 +38,7 @@ public class ClientHandler {
 //            System.out.println("Подключился " + name);
             LOGGER.info("Подключился " + name);
             socket.setSoTimeout(SOCKET_TIMEOUT);
-            ExecutorService service = Executors.newFixedThreadPool(2);
-            service.execute(new Runnable() {
-                @Override
-                public void run() {
-                    sendTimeout();
-                }
-            });
+            ExecutorService service = Executors.newFixedThreadPool(1);
             service.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -64,55 +59,48 @@ public class ClientHandler {
         }
     }
 
-    private void sendTimeout() {
-        long start = System.currentTimeMillis();
-        long finish;
-        try {
-            while (socket.getSoTimeout() != 0) {
-                finish = System.currentTimeMillis();
-                if (socket.getSoTimeout() - (finish - start) <= 10000 && socket.getSoTimeout() != 0) {
-                    sendMsg("Server: ЕСЛИ ВЫ НЕ АВТОРИЗУЕТЕСЬ, ТО БУДЕТЕ ОТКЛЮЧЕНЫ ЧЕРЕЗ 10 СЕКУНД!");
-                    break;
-                }
-            }
-        } catch (SocketException e) {
-            e.printStackTrace();
-        }
-    }
-
     private void authentication() throws IOException {
         while (true) {
-            String str = in.readUTF();
-            if (str.startsWith("/auth")) {
-                String[] parts = str.split("\\s");
-                String nick;
-                String login;
-                if (parts.length <= 2) {
-                    sendMsg("Server: Недостаточно данных для аутентификации");
-                } else {
-                    nick = myServer.getAuthService().getNickByLoginPass(parts[1], parts[2]);
-                    login = parts[1];
-                    if (nick != null) {
-                        if (!myServer.isAccountBusy(nick)) {
-                            sendMsg("/authok " + nick + " " + login);
-                            String log = name;
-//                            System.out.print(name);
-                            name = nick;
-                            myServer.subscribe(this);
-                            socket.setSoTimeout(0);
-//                            System.out.println(" аутентифицирован под ником: " + name);
-                            log += " аутентифицирован под ником: " + name;
-                            LOGGER.info(log);
-                            myServer.broadcastMsg(name + " зашел в чат");
-                            LOGGER.info(name + " зашел в чат");
-                            return;
-                        } else {
-                            sendMsg("Учетная запись уже используется");
-                        }
+            try {
+                String str = in.readUTF();
+                if (str.startsWith("/auth")) {
+                    String[] parts = str.split("\\s");
+                    String nick;
+                    String login;
+                    if (parts.length <= 2) {
+                        sendMsg("Server: Недостаточно данных для аутентификации");
                     } else {
-                        sendMsg("Неверные логин/пароль");
+                        nick = myServer.getAuthService().getNickByLoginPass(parts[1], parts[2]);
+                        login = parts[1];
+                        if (nick != null) {
+                            if (!myServer.isAccountBusy(nick)) {
+                                sendMsg("/authok " + nick + " " + login);
+                                String log = name;
+//                            System.out.print(name);
+                                name = nick;
+                                myServer.subscribe(this);
+                                socket.setSoTimeout(0);
+//                            System.out.println(" аутентифицирован под ником: " + name);
+                                log += " аутентифицирован под ником: " + name;
+                                LOGGER.info(log);
+                                myServer.broadcastMsg(name + " зашел в чат");
+                                LOGGER.info(name + " зашел в чат");
+                                return;
+                            } else {
+                                sendMsg("Учетная запись уже используется");
+                            }
+                        } else {
+                            sendMsg("Неверные логин/пароль");
+                        }
                     }
                 }
+            } catch (SocketTimeoutException e) {
+                if (socket.getSoTimeout() > 10000) {
+                    sendMsg("Server: ЕСЛИ ВЫ НЕ АВТОРИЗУЕТЕСЬ, ТО БУДЕТЕ ОТКЛЮЧЕНЫ ЧЕРЕЗ 10 СЕКУНД!");
+                } else {
+                    throw new SocketTimeoutException();
+                }
+                socket.setSoTimeout(10000);
             }
         }
     }

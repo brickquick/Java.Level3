@@ -100,3 +100,16 @@ INFO  2021-06-08 16:06:22 [main] lesson6.homework6.Server.ClientHandler (ClientH
 INFO  2021-06-08 16:06:22 [main] lesson6.homework6.Server.MyServer (MyServer.java:33) - Сервер ожидает подключения
 INFO  2021-06-08 16:06:31 [pool-4-thread-2] lesson6.homework6.Server.ClientHandler (ClientHandler.java:198) - UNKNOWN-3 вышел из чата
 INFO  2021-06-08 16:06:35 [pool-2-thread-2] lesson6.homework6.Server.ClientHandler (ClientHandler.java:198) - nick2 вышел из чата
+INFO  2021-06-14 00:21:42 [main] lesson6.homework6.Server.BaseAuthService (BaseAuthService.java:141) - Успешное подключение к базе данных
+INFO  2021-06-14 00:21:42 [main] lesson6.homework6.Server.BaseAuthService (BaseAuthService.java:43) - Таблица уже существует
+INFO  2021-06-14 00:21:42 [main] lesson6.homework6.Server.BaseAuthService (BaseAuthService.java:49) - Таблица уже заполнена
+INFO  2021-06-14 00:21:42 [main] lesson6.homework6.Server.MyServer (MyServer.java:29) - Сервер успешно запущен
+INFO  2021-06-14 00:21:42 [main] lesson6.homework6.Server.MyServer (MyServer.java:33) - Сервер ожидает подключения
+INFO  2021-06-14 00:22:04 [main] lesson6.homework6.Server.ClientHandler (ClientHandler.java:39) - Подключился UNKNOWN-1
+INFO  2021-06-14 00:22:04 [main] lesson6.homework6.Server.MyServer (MyServer.java:33) - Сервер ожидает подключения
+INFO  2021-06-14 00:22:34 [pool-2-thread-1] lesson6.homework6.Server.ClientHandler (ClientHandler.java:186) - UNKNOWN-1 вышел из чата
+INFO  2021-06-14 00:22:41 [main] lesson6.homework6.Server.ClientHandler (ClientHandler.java:39) - Подключился UNKNOWN-2
+INFO  2021-06-14 00:22:41 [main] lesson6.homework6.Server.MyServer (MyServer.java:33) - Сервер ожидает подключения
+INFO  2021-06-14 00:23:05 [pool-3-thread-1] lesson6.homework6.Server.ClientHandler (ClientHandler.java:85) - UNKNOWN-2 аутентифицирован под ником: nick1
+INFO  2021-06-14 00:23:05 [pool-3-thread-1] lesson6.homework6.Server.ClientHandler (ClientHandler.java:87) - nick1 зашел в чат
+INFO  2021-06-14 00:23:16 [pool-3-thread-1] lesson6.homework6.Server.ClientHandler (ClientHandler.java:186) - nick1 вышел из чата
