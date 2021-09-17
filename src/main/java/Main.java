@@ -10,10 +10,10 @@ public class Main {
 
     public static final int CARS_COUNT = 10;
 
-    public static volatile CyclicBarrier cyclicBarrier;
-    public static volatile CountDownLatch cdl;
-    public static volatile CountDownLatch cdlEnd;
-    public static volatile Semaphore smp;
+    public static CyclicBarrier cyclicBarrier;
+    public static CountDownLatch cdl;
+    public static CountDownLatch cdlEnd;
+    public static Semaphore smp;
     private static final Lock lock = new ReentrantLock();
 
     public static void main(String[] args) {
